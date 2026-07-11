@@ -75,8 +75,11 @@ namespace petus {
         if (am) {
             am->m_accountID = s.account;
             am->m_username = s.name;
-            // A real token/GJP is not needed for password login because the
-            // launcher already authenticated us; the server trusts the token.
+            // The game sends m_GJP2 as the password hash on every request. Petus
+            // accounts have a random password the client doesn't know, so we put
+            // "petus:<launcher token>" here — the core authenticates by token.
+            // This makes stat/score/profile saves land on the real account.
+            am->m_GJP2 = "petus:" + s.token;
         }
     }
 
