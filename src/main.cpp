@@ -1,6 +1,7 @@
 #include "Session.hpp"
 #include "DefaultLevels.hpp"
 #include "VerifyScreenshot.hpp"
+#include "Textboxes.hpp"
 
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
@@ -39,6 +40,13 @@ class $modify(PetusMenuLayer, MenuLayer) {
 
         // Make the game act as the launcher-authenticated user.
         petus::applySession();
+
+        // Startup notices: not-registered / welcome+bonus / ban (once per open).
+        static bool s_noticesShown = false;
+        if (!s_noticesShown) {
+            s_noticesShown = true;
+            petus::showStartupNotices();
+        }
 
         // Petus ID only: there is no in-game register/login.
         if (Mod::get()->getSettingValue<bool>("disable-ingame-login")) {

@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} SHARED
     src/Session.cpp
     src/DefaultLevels.cpp
     src/VerifyScreenshot.cpp
+    src/Textboxes.cpp
 )
 
 if (NOT DEFINED ENV{GEODE_SDK})
