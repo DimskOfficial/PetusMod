@@ -1,0 +1,33 @@
+{
+  "geode": "3.0.0",
+  "gd": {
+    "win": "2.206",
+    "android": "2.206"
+  },
+  "version": "v1.0.0",
+  "id": "petus.gdps",
+  "name": "Petus GDPS",
+  "developer": "Dimsk",
+  "description": "Integrates Geometry Dash with the PetusGDPS ecosystem: Petus ID login, Play deep-links, verification screenshots, and custom default levels.",
+  "repository": "https://github.com/DimskOfficial/PetusMod",
+  "settings": {
+    "server-base": {
+      "name": "Server base URL",
+      "description": "PetusCore API base (Boomlings endpoints + site API).",
+      "type": "string",
+      "default": "https://gdps.petus.ru"
+    },
+    "imgbb-key": {
+      "name": "imgbb API key",
+      "description": "Key used to upload verification screenshots.",
+      "type": "string",
+      "default": "b1918d3c45409045f212420fc9f9023c"
+    },
+    "disable-ingame-login": {
+      "name": "Disable in-game login",
+      "description": "Hide the account login/register UI; auth comes from the launcher only.",
+      "type": "bool",
+      "default": true
+    }
+  }
+}

@@ -1,0 +1,6 @@
+.cache/
+build/
+build-*/
+*.geode
+CMakeCache.txt
+CMakeFiles/
