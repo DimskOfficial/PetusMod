@@ -2,10 +2,12 @@
 #include "DefaultLevels.hpp"
 #include "VerifyScreenshot.hpp"
 #include "Textboxes.hpp"
+#include "ModsPopup.hpp"
 
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/LevelSelectLayer.hpp>
+#include <Geode/modify/OptionsLayer.hpp>
 
 using namespace geode::prelude;
 
@@ -55,6 +57,13 @@ class $modify(PetusMenuLayer, MenuLayer) {
             }
         }
 
+        // Remove Geode's own mods button from the main menu — mods are reached
+        // through Options -> Mods instead.
+        if (auto* geodeBtn = this->getChildByID("geode.loader/geode-button")) {
+            geodeBtn->setVisible(false);
+            geodeBtn->removeFromParent();
+        }
+
         // Refresh the editable Play levels in the background.
         petus::fetchDefaultLevels([](std::vector<DefaultLevel> levels) {
             petus::g_defaults = std::move(levels);
@@ -94,5 +103,31 @@ class $modify(PetusLevelSelectLayer, LevelSelectLayer) {
             log::debug("default override: slot {} -> level {} ({})", d.slot, d.levelID, d.name);
         }
         return true;
+    }
+};
+
+// ---- Options: add a "Mods" button that opens our own mods list -------------
+class $modify(PetusOptionsLayer, OptionsLayer) {
+    void customSetup() {
+        OptionsLayer::customSetup();
+
+        // Find the options button menu and append a "Mods" row.
+        auto* menu = this->getChildByID("options-menu");
+        if (!menu) {
+            // Fallback: first CCMenu child.
+            for (auto* c : CCArrayExt<CCNode*>(this->getChildren())) {
+                if (auto* m = typeinfo_cast<CCMenu*>(c)) { menu = m; break; }
+            }
+        }
+        if (!menu) return;
+
+        auto spr = ButtonSprite::create("Mods", "goldFont.fnt", "GJ_button_01.png", 1.0f);
+        spr->setScale(0.7f);
+        auto btn = CCMenuItemExt::createSpriteExtra(spr, [](CCObject*) {
+            petus::openModsPopup();
+        });
+        btn->setID("petus-mods-button");
+        menu->addChild(btn);
+        menu->updateLayout();
     }
 };
