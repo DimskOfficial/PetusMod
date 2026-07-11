@@ -58,11 +58,14 @@ class $modify(PetusMenuLayer, MenuLayer) {
         }
 
         // Remove Geode's own mods button from the main menu — mods are reached
-        // through Options -> Mods instead.
-        if (auto* geodeBtn = this->getChildByID("geode.loader/geode-button")) {
-            geodeBtn->setVisible(false);
-            geodeBtn->removeFromParent();
-        }
+        // through Options -> Mods instead. Geode adds its button AFTER
+        // MenuLayer::init, so defer the removal to the next frame and search the
+        // whole tree (the button lives inside a child menu).
+        this->runAction(CCSequence::create(
+            CCDelayTime::create(0.05f),
+            CCCallFunc::create(this, callfunc_selector(PetusMenuLayer::removeGeodeButton)),
+            nullptr
+        ));
 
         // Refresh the editable Play levels in the background.
         petus::fetchDefaultLevels([](std::vector<DefaultLevel> levels) {
@@ -84,6 +87,28 @@ class $modify(PetusMenuLayer, MenuLayer) {
         }
 
         return true;
+    }
+
+    // Recursively find and hide Geode's mods button (its ID varies by version;
+    // match by id substring). Called a frame after init so the loader has added it.
+    void removeGeodeButton() {
+        removeGeodeButtonIn(this);
+    }
+    void removeGeodeButtonIn(CCNode* node) {
+        if (!node) return;
+        auto* children = node->getChildren();
+        if (!children) return;
+        for (int i = 0; i < children->count(); i++) {
+            auto* child = static_cast<CCNode*>(children->objectAtIndex(i));
+            std::string id = child->getID();
+            if (id.find("geode") != std::string::npos &&
+                (id.find("button") != std::string::npos || id.find("mods") != std::string::npos)) {
+                child->setVisible(false);
+                child->removeFromParent();
+                return;
+            }
+            removeGeodeButtonIn(child);
+        }
     }
 };
 
