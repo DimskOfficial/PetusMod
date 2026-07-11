@@ -66,7 +66,7 @@ namespace petus {
         // the mod attaches it to site API calls (comments/likes/preview).
         //
         // NOTE: exact GJAccountManager members can shift between GD versions —
-        // verify against your target (2.206). These are the common ones.
+        // verify against your target (2.2081). These are the common ones.
         auto* am = GJAccountManager::sharedState();
         if (am) {
             am->m_accountID = s.account;

@@ -88,7 +88,7 @@ class $modify(PetusLevelSelectLayer, LevelSelectLayer) {
 
         for (auto& d : petus::g_defaults) {
             if (!d.enabled) continue;
-            // TODO(2.206): map d.slot -> the on-screen main level and swap its
+            // TODO(2.2081): map d.slot -> the on-screen main level and swap its
             // name/levelString/levelID. LevelSelectLayer keeps the main levels
             // in m_levelPages / BoomScrollLayer; the exact member depends on the
             // GD version. `d` carries everything needed to build a GJGameLevel.

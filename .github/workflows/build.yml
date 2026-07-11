@@ -15,6 +15,7 @@ jobs:
       - uses: geode-sdk/build-geode-mod@main
         id: build
         with:
+          sdk: v5.8.0
           target: Win64
           combine: true
 

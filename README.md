@@ -31,7 +31,7 @@ inside the game archive the launcher installs).
 ## Version notes / TODO
 
 This is a working skeleton. A few hooks touch GD-version-specific members
-(marked with `TODO(2.206)` / `NOTE` in the source) that should be verified
+(marked with `TODO(2.2081)` / `NOTE` in the source) that should be verified
 against the exact target build:
 
 - `Session.cpp` — `GJAccountManager` member names.
