@@ -42,6 +42,10 @@ namespace petus {
         g_session.account = json.contains("account")
             ? static_cast<int>(std::atoi(json["account"].asString().unwrapOr("0").c_str()))
             : 0;
+        // Optional: the launcher writes "play" when opened via petusgdps://play.
+        g_session.playLevel = json.contains("play")
+            ? json["play"].asInt().unwrapOr(0)
+            : 0;
         g_session.valid = !g_session.token.empty();
 
         log::info("Loaded Petus session for '{}' (account {})", g_session.name, g_session.account);

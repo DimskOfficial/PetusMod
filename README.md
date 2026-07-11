@@ -17,16 +17,27 @@ ecosystem. Built on the [Geode](https://geode-sdk.org) mod loader.
 Requires the Geode SDK and CLI. See the
 [Geode getting-started guide](https://docs.geode-sdk.org/getting-started/).
 
-```bash
-# GEODE_SDK env var must point at your SDK checkout
-geode build
-# or manually:
-cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-cmake --build build --config RelWithDebInfo
+On Windows the mod **must** be built with **clang-cl** (plain MSVC crashes on
+Geode's headers). The repo includes `build-clang.bat`, which sets up the MSVC
+environment, forces clang-cl + Ninja, and points CMake at a local bindings
+clone so a flaky network doesn't abort the build:
+
+```bat
+:: one-time: clone bindings so CMake never re-fetches them
+git clone --depth 1 https://github.com/geode-sdk/bindings.git C:\Users\<you>\geode-bindings
+
+:: then just:
+build-clang.bat
 ```
 
-The resulting `petus.gdps.geode` goes into your GD `geode/mods` folder (or ships
-inside the game archive the launcher installs).
+It produces `build/petus.gdps.geode` and installs it into your GD profile.
+
+Toolchain used (all installable via winget): `GeodeSDK.GeodeCLI`, `LLVM.LLVM`,
+plus VS 2022 Build Tools (MSVC + bundled CMake/Ninja). Set `GEODE_SDK` to your
+SDK path (`geode sdk install` does this automatically).
+
+Plain `geode build` also works **only if** your default CMake generator uses
+clang-cl; otherwise use `build-clang.bat`.
 
 ## Version notes / TODO
 

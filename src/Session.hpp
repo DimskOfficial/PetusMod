@@ -11,6 +11,7 @@ namespace petus {
         std::string token;   // core bearer token (site API)
         std::string name;    // display username
         int account = 0;     // GDPS account id
+        int playLevel = 0;   // level to auto-open (from petusgdps://play deep link)
         bool valid = false;
     };
 

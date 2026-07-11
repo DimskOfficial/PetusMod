@@ -12,22 +12,10 @@ namespace petus {
     // Cache of the admin-editable Play levels, refreshed on the main menu.
     static std::vector<DefaultLevel> g_defaults;
 
-    // A pending level to jump into, set from a petusgdps://play?level=ID deep link.
+    // A pending level to jump into, taken from the launcher session (which
+    // receives the petusgdps://play?level=ID deep link and writes it into
+    // session.json as "play").
     static int g_pendingPlayLevel = 0;
-
-    // Parse petusgdps://play?level=<id> out of the process arguments (the
-    // launcher forwards the deep link when the site's "Play" button is used).
-    static void parseDeepLink() {
-        for (auto& arg : Loader::get()->getLaunchArguments()) {
-            auto pos = arg.find("petusgdps://play");
-            if (pos == std::string::npos) continue;
-            auto lv = arg.find("level=");
-            if (lv != std::string::npos) {
-                g_pendingPlayLevel = std::atoi(arg.substr(lv + 6).c_str());
-                log::info("Deep-link: play level {}", g_pendingPlayLevel);
-            }
-        }
-    }
 }
 
 using namespace petus;
@@ -35,9 +23,12 @@ using namespace petus;
 // ---- Mod entry -------------------------------------------------------------
 $on_mod(Loaded) {
     petus::initVerifyScreenshot();
-    petus::parseDeepLink();
-    // Load the launcher-provided session immediately.
-    petus::session();
+    // Load the launcher-provided session immediately, incl. any deep-link level.
+    const auto& s = petus::session();
+    petus::g_pendingPlayLevel = s.playLevel;
+    if (petus::g_pendingPlayLevel > 0) {
+        log::info("Deep-link: play level {}", petus::g_pendingPlayLevel);
+    }
     log::info("Petus GDPS mod loaded. Server: {}", petus::serverBase());
 }
 
@@ -67,7 +58,7 @@ class $modify(PetusMenuLayer, MenuLayer) {
             petus::g_pendingPlayLevel = 0;
             Loader::get()->queueInMainThread([id]() {
                 auto* glm = GameLevelManager::sharedState();
-                glm->downloadLevel(id, false);
+                glm->downloadLevel(id, false, 0);
                 log::info("Requested Play deep-link level {}", id);
                 // The full flow (build PlayLayer once the level downloads) is
                 // wired through GameLevelManager delegates — hook there for a

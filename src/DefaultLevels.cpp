@@ -2,6 +2,7 @@
 #include "Session.hpp"
 
 #include <Geode/utils/web.hpp>
+#include <Geode/utils/async.hpp>
 
 using namespace geode::prelude;
 
@@ -10,17 +11,13 @@ namespace petus {
     void fetchDefaultLevels(std::function<void(std::vector<DefaultLevel>)> cb) {
         auto url = serverBase() + "/api/defaultlevels";
 
-        static EventListener<web::WebTask> s_listener;
         auto req = web::WebRequest();
         req.header("Accept", "application/json");
 
-        s_listener.bind([cb = std::move(cb)](web::WebTask::Event* e) {
-            auto* res = e->getValue();
-            if (!res) return;
-
+        async::spawn(req.get(url), [cb = std::move(cb)](web::WebResponse response) {
             std::vector<DefaultLevel> out;
-            if (res->ok()) {
-                auto json = res->json().unwrapOr(matjson::Value::array());
+            if (response.ok()) {
+                auto json = response.json().unwrapOr(matjson::Value::array());
                 // Core returns { ok: true, data: [ {slot, levelID, name, levelString} ] }
                 auto arr = json.contains("data") ? json["data"] : json;
                 if (arr.isArray()) {
@@ -35,12 +32,10 @@ namespace petus {
                 }
                 log::info("Fetched {} default Play levels", out.size());
             } else {
-                log::warn("Failed to fetch default levels ({})", res->code());
+                log::warn("Failed to fetch default levels ({})", response.code());
             }
             cb(std::move(out));
         });
-
-        s_listener.setFilter(req.get(url));
     }
 
 }
