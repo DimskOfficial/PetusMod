@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME} SHARED
     src/VerifyScreenshot.cpp
     src/Textboxes.cpp
     src/ModsPopup.cpp
+    src/VersionCheck.cpp
 )
 
 if (NOT DEFINED ENV{GEODE_SDK})

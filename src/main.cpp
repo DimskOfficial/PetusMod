@@ -3,6 +3,7 @@
 #include "VerifyScreenshot.hpp"
 #include "Textboxes.hpp"
 #include "ModsPopup.hpp"
+#include "VersionCheck.hpp"
 
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
@@ -48,6 +49,7 @@ class $modify(PetusMenuLayer, MenuLayer) {
         if (!s_noticesShown) {
             s_noticesShown = true;
             petus::showStartupNotices();
+            petus::checkGameVersion();
         }
 
         // Petus ID only: there is no in-game register/login.
