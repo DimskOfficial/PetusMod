@@ -86,9 +86,10 @@ namespace petus {
         rt->end();
 
         auto path = dirs::getTempDir() / fmt::format("petus_verify_{}.png", levelID);
-        // saveToFile writes a PNG under the temp/save dir.
-        if (rt->newCCImage()) {
-            auto* img = rt->newCCImage();
+        // saveToFile writes a PNG under the temp dir. newCCImage() returns an
+        // owned image — grab it once, save, release.
+        auto* img = rt->newCCImage();
+        if (img) {
             img->saveToFile(path.string().c_str(), false);
             img->release();
             log::info("verify screenshot saved: {}", path.string());
