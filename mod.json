@@ -4,11 +4,11 @@
     "win": "2.2081",
     "android": "2.2081"
   },
-  "version": "v1.0.0",
+  "version": "v1.1.0",
   "id": "petus.gdps",
   "name": "Petus GDPS",
   "developer": "Dimsk",
-  "description": "Integrates Geometry Dash with the PetusGDPS ecosystem: Petus ID login, Play deep-links, verification screenshots, and custom default levels.",
+  "description": "Integrates Geometry Dash with the PetusGDPS ecosystem: Petus ID login, Play deep-links, verification screenshots, custom default levels, and Versus competitive multiplayer.",
   "repository": "https://github.com/DimskOfficial/PetusMod",
   "dependencies": {
     "geode.node-ids": ">=v1.23.3"
@@ -31,6 +31,18 @@
       "description": "Hide the account login/register UI; auth comes from the launcher only.",
       "type": "bool",
       "default": true
+    },
+    "versus-hide-nicks": {
+      "name": "Versus: скрыть ники",
+      "description": "Не показывать ники других игроков во время матча Versus.",
+      "type": "bool",
+      "default": false
+    },
+    "versus-hide-cubes": {
+      "name": "Versus: скрыть кубы",
+      "description": "Не показывать кубики других игроков во время матча Versus.",
+      "type": "bool",
+      "default": false
     }
   }
 }

@@ -14,6 +14,12 @@ add_library(${PROJECT_NAME} SHARED
     src/Textboxes.cpp
     src/ModsPopup.cpp
     src/VersionCheck.cpp
+    src/VersusTab.cpp
+    src/VersusApi.cpp
+    src/VersusLobbyPopup.cpp
+    src/VersusCountdown.cpp
+    src/VersusMatch.cpp
+    src/VersusResults.cpp
 )
 
 if (NOT DEFINED ENV{GEODE_SDK})
