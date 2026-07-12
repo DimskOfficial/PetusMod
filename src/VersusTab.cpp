@@ -3,36 +3,57 @@
 #include "Session.hpp"
 
 #include <Geode/Geode.hpp>
-#include <Geode/modify/MenuLayer.hpp>
+#include <Geode/modify/CreatorLayer.hpp>
 #include <Geode/utils/cocos.hpp>
 
 using namespace geode::prelude;
 
-// Adds the "Versus" entry to the main menu. Kept in its own $modify so it never
-// clashes with the primary PetusMenuLayer hook in main.cpp.
-class $modify(VersusMenuLayer, MenuLayer) {
+namespace {
+    // True if `node` is a CCSprite currently displaying the given sprite frame.
+    bool spriteShowsFrame(CCNode* node, CCSpriteFrame* frame) {
+        auto* spr = typeinfo_cast<CCSprite*>(node);
+        return spr && frame && spr->isFrameDisplayed(frame);
+    }
+
+    // Depth-first search for the native Versus button: a CCMenuItemSpriteExtra
+    // whose normal image is (or contains) a sprite showing GJ_versusBtn_001.png.
+    CCMenuItemSpriteExtra* findVersusButton(CCNode* node, CCSpriteFrame* frame) {
+        if (!node) return nullptr;
+
+        if (auto* item = typeinfo_cast<CCMenuItemSpriteExtra*>(node)) {
+            auto* image = item->getNormalImage();
+            if (spriteShowsFrame(image, frame)) return item;
+            // Some buttons wrap the frame sprite inside a ButtonSprite/child.
+            if (image) {
+                for (auto* child : CCArrayExt<CCNode*>(image->getChildren())) {
+                    if (spriteShowsFrame(child, frame)) return item;
+                }
+            }
+        }
+
+        for (auto* child : CCArrayExt<CCNode*>(node->getChildren())) {
+            if (auto* found = findVersusButton(child, frame)) return found;
+        }
+        return nullptr;
+    }
+}
+
+// Repoints the game's native Versus button (in the "Create" tab) at our popup.
+// Vanilla, that button shows a "Versus mode has been delayed..." dialog.
+class $modify(PetusCreatorLayer, CreatorLayer) {
     bool init() {
-        if (!MenuLayer::init()) return false;
+        if (!CreatorLayer::init()) return false;
 
-        // Bottom-row style button; placed alongside the main menu buttons.
-        auto* menu = this->getChildByID("bottom-menu");
-        if (!menu) menu = this->getChildByID("main-menu");
-        if (!menu) return true; // node-ids missing; skip rather than crash
-
-        auto spr = ButtonSprite::create("Versus", "goldFont.fnt", "GJ_button_04.png", 1.0f);
-        spr->setScale(0.8f);
-        auto btn = CCMenuItemExt::createSpriteExtra(spr, [](CCObject*) {
-            VersusMenuLayer::onVersus();
-        });
-        btn->setID("petus-versus-button");
-        menu->addChild(btn);
-        menu->updateLayout();
+        auto* frame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("GJ_versusBtn_001.png");
+        if (auto* item = findVersusButton(this, frame)) {
+            item->setTarget(this, menu_selector(PetusCreatorLayer::onPetusVersus));
+        }
+        // If the button isn't found (layout changed), leave the layer untouched.
 
         return true;
     }
 
-    // Static so the button callback needs no captured `this`.
-    static void onVersus() {
+    void onPetusVersus(CCObject*) {
         if (!petus::versus::hasSession()) {
             FLAlertLayer::create(
                 "Versus",
